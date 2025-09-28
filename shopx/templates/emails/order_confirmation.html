@@ -1,0 +1,7 @@
+{% extends "emails/base_email.html" %}
+{% block title %}تأیید سفارش{% endblock %}
+{% block content %}
+<h3>سفارش شما ثبت شد</h3>
+<p>شماره سفارش: <strong>{{ order.number }}</strong></p>
+<p>مبلغ کل: <strong>{{ order.total }}</strong></p>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "emails/base_email.html" %}
+{% block title %}تست ایمیل{% endblock %}
+{% block content %}
+<h3>سلام!</h3>
+<p>این یک ایمیل تست برای دامنه: <strong>{{ tenant.domain }}</strong> است.</p>
+{% endblock %}
