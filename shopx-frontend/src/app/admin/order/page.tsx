@@ -7,21 +7,26 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    // اینجا باید به API واقعی وصل بشه
-    setOrders([{ id: '101', customer: 'علی', total: 500000, status: 'جدید' }]);
+    fetch('/api/orders')
+      .then(res => res.json())
+      .then(setOrders);
   }, []);
 
   return (
-    <section className="p-4">
-      <h1 className="text-lg font-bold mb-4">مدیریت سفارش‌ها</h1>
-      <ul className="space-y-2">
-        {orders.map(o => (
-          <li key={o.id} className="flex justify-between border p-2">
-            <span>#{o.id} - {o.customer} - {o.total} تومان</span>
-            <span className="text-sm">{o.status}</span>
-          </li>
-        ))}
-      </ul>
+    <section className="p-4 space-y-4">
+      <h1 className="text-lg font-bold">مدیریت سفارش‌ها</h1>
+      {orders.length === 0 ? (
+        <p>هیچ سفارشی ثبت نشده.</p>
+      ) : (
+        <ul className="space-y-2">
+          {orders.map(o => (
+            <li key={o.id} className="border p-2 flex justify-between">
+              <span>{o.customer} — {o.total} تومان</span>
+              <span>{o.status}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

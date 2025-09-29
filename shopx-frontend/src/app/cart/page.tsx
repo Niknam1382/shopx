@@ -5,9 +5,7 @@ import { Cart, type CartItem } from '@/lib/cart';
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  useEffect(() => {
-    setItems(Cart.read());
-  }, []);
+  useEffect(() => { setItems(Cart.read()); }, []);
 
   return (
     <section className="space-y-4">
@@ -17,16 +15,16 @@ export default function CartPage() {
       ) : (
         <ul className="space-y-2">
           {items.map(i => (
-            <li key={i.id} className="flex items-center justify-between border rounded p-2">
+            <li key={i.productId} className="flex items-center justify-between border rounded p-2">
               <div>
                 <p className="font-medium">{i.title}</p>
                 <p className="text-sm text-muted-foreground">{i.price} × {i.qty}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => setItems(Cart.update(i.id, i.qty - 1))}>-</button>
+                <button onClick={() => setItems(Cart.update(i.productId, i.qty - 1))}>-</button>
                 <span>{i.qty}</span>
-                <button onClick={() => setItems(Cart.update(i.id, i.qty + 1))}>+</button>
-                <button className="text-red-600" onClick={() => setItems(Cart.remove(i.id))}>حذف</button>
+                <button onClick={() => setItems(Cart.update(i.productId, i.qty + 1))}>+</button>
+                <button className="text-red-600" onClick={() => setItems(Cart.remove(i.productId))}>حذف</button>
               </div>
             </li>
           ))}

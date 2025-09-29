@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // می‌تونی بعداً postgres یا mysql بذاری
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  title     String
+  price     Int
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     OrderItem[]
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  customer   String
+  phone      String?
+  address    String?
+  total      Int
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  qty       Int
+  price     Int
+  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  CANCELED
+}
