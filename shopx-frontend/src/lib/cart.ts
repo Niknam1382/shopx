@@ -1,24 +1,30 @@
-export type CartItem = { product_id: number; name: string; price: number; quantity: number; image_url?: string };
+export type CartItem = { id: string; title: string; price: number; qty: number; image?: string };
+const KEY = 'shopx_cart';
 
-const KEY = "cart";
-
-export function getCart(): CartItem[] {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
-}
-export function saveCart(items: CartItem[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(items));
-}
-export function addToCart(item: CartItem) {
-  const cart = getCart();
-  const idx = cart.findIndex(i => i.product_id === item.product_id);
-  if (idx >= 0) cart[idx].quantity += item.quantity;
-  else cart.push(item);
-  saveCart(cart);
-}
-export function removeFromCart(product_id: number) {
-  saveCart(getCart().filter(i => i.product_id !== product_id));
-}
-export function clearCart() { saveCart([]); }
-export function total(cart = getCart()) { return cart.reduce((s, i) => s + i.price * i.quantity, 0); }
+export const Cart = {
+  read(): CartItem[] {
+    try { return JSON.parse(localStorage.getItem(KEY) ?? '[]'); } catch { return []; }
+  },
+  write(items: CartItem[]) {
+    localStorage.setItem(KEY, JSON.stringify(items));
+  },
+  add(item: CartItem) {
+    const cart = Cart.read();
+    const idx = cart.findIndex(i => i.id === item.id);
+    if (idx >= 0) cart[idx].qty += item.qty; else cart.push(item);
+    Cart.write(cart); return cart;
+  },
+  remove(id: string) {
+    const cart = Cart.read().filter(i => i.id !== id);
+    Cart.write(cart); return cart;
+  },
+  update(id: string, qty: number) {
+    const cart = Cart.read();
+    const idx = cart.findIndex(i => i.id === id);
+    if (idx >= 0) cart[idx].qty = Math.max(1, qty);
+    Cart.write(cart); return cart;
+  },
+  total() {
+    return Cart.read().reduce((sum, i) => sum + i.price * i.qty, 0);
+  }
+};

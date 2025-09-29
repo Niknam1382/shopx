@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const protectedPaths = ["/orders", "/account", "/checkout"];
+export const config = { matcher: ['/dashboard/:path*'] };
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  if (protectedPaths.some(p => pathname.startsWith(p))) {
-    const token = req.cookies.get("token")?.value; // اگر خواستی توکن را در کوکی نگه داری
-    // فعلاً بدون کوکی: رد کن و بفرست به لاگین
-    if (!token) {
-      const url = new URL("/login", req.url);
-      return NextResponse.redirect(url);
-    }
+export default function middleware(req: NextRequest) {
+  const hasSession = req.cookies.get('session')?.value;
+  if (!hasSession && req.nextUrl.pathname.startsWith('/dashboard')) {
+    const url = req.nextUrl.clone();
+    url.pathname = '/account/login';
+    return NextResponse.redirect(url);
   }
   return NextResponse.next();
 }
-export const config = { matcher: ["/orders/:path*", "/account/:path*", "/checkout"] };

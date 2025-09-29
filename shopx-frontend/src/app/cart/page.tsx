@@ -1,38 +1,41 @@
-"use client";
-
-import { getCart, removeFromCart, total, clearCart } from "@/lib/cart";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
+import { Cart, type CartItem } from '@/lib/cart';
 
 export default function CartPage() {
-  const [items, setItems] = useState(getCart());
+  const [items, setItems] = useState<CartItem[]>([]);
 
-  useEffect(() => { setItems(getCart()); }, []);
+  useEffect(() => {
+    setItems(Cart.read());
+  }, []);
 
   return (
-    <section>
-      <h1 className="text-2xl font-bold mb-4">سبد خرید</h1>
+    <section className="space-y-4">
+      <h1 className="text-lg font-bold">سبد خرید</h1>
       {items.length === 0 ? (
         <p>سبد خرید شما خالی است.</p>
       ) : (
-        <>
-          <ul className="space-y-3">
-            {items.map(i => (
-              <li key={i.product_id} className="flex items-center justify-between bg-white border rounded p-3">
-                <div>
-                  <div className="font-semibold">{i.name}</div>
-                  <div className="text-sm text-gray-600">{i.price.toLocaleString()} × {i.quantity}</div>
-                </div>
-                <button onClick={() => { removeFromCart(i.product_id); setItems(getCart()); }} className="text-red-600">حذف</button>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 font-bold">جمع: {total(items).toLocaleString()} تومان</div>
-          <div className="mt-4 flex gap-3">
-            <a href="/checkout" className="bg-blue-600 text-white px-4 py-2 rounded">ادامه خرید</a>
-            <button onClick={() => { clearCart(); setItems([]); }} className="border px-4 py-2 rounded">خالی کردن سبد</button>
-          </div>
-        </>
+        <ul className="space-y-2">
+          {items.map(i => (
+            <li key={i.id} className="flex items-center justify-between border rounded p-2">
+              <div>
+                <p className="font-medium">{i.title}</p>
+                <p className="text-sm text-muted-foreground">{i.price} × {i.qty}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setItems(Cart.update(i.id, i.qty - 1))}>-</button>
+                <span>{i.qty}</span>
+                <button onClick={() => setItems(Cart.update(i.id, i.qty + 1))}>+</button>
+                <button className="text-red-600" onClick={() => setItems(Cart.remove(i.id))}>حذف</button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
+      <div>
+        <p>مجموع: {Cart.total()} تومان</p>
+        <a href="/checkout" className="inline-block mt-2 rounded bg-black text-white px-4 py-2">ادامه خرید</a>
+      </div>
     </section>
   );
 }
