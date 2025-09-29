@@ -4,6 +4,15 @@ from rest_framework import status, permissions
 from django.contrib.auth import login
 from .serializers import RegisterSerializer, LoginSerializer
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    return Response({"username": request.user.username, "email": request.user.email})
+
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):

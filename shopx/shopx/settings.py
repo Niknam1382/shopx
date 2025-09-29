@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.admin','django.contrib.auth','django.contrib.contenttypes',
     'django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',   # 👈 مطمئن شو اینجا corsheaders اضافه شده
     'core','dashboard','customers','catalog','orders','notifications','common',
 ]
 
@@ -27,9 +28,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.TenantMiddleware',
+    'corsheaders.middleware.CorsMiddleware',   # 👈 اینجا درست شد
 ]
 
 ROOT_URLCONF = 'shopx.urls'
+
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [BASE_DIR / 'templates'],
@@ -42,23 +45,10 @@ TEMPLATES = [{
         'core.context_processors.site_settings',
     ]},
 }]
+
 WSGI_APPLICATION = 'shopx.wsgi.application'
 ASGI_APPLICATION = 'shopx.asgi.application'
-'''
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
-    u = urlparse(DATABASE_URL)
-    if u.scheme.startswith('postgres'):
-        DATABASES = {'default':{
-            'ENGINE':'django.db.backends.postgresql',
-            'NAME':u.path[1:],'USER':u.username or '','PASSWORD':u.password or '',
-            'HOST':u.hostname or '','PORT':u.port or '',
-        }}
-    else:
-        DATABASES = {'default': {'ENGINE':'django.db.backends.sqlite3','NAME': BASE_DIR/'db.sqlite3'}}
-else:
-    DATABASES = {'default': {'ENGINE':'django.db.backends.sqlite3','NAME': BASE_DIR/'db.sqlite3'}}
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -79,23 +69,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
 }
-"""
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.example.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@example.com')
-"""
-# به جای SMTP ثابت، از بک‌اند پویا استفاده می‌کنیم
-EMAIL_BACKEND = "core.email_backend.DynamicEmailBackend"
 
-# این مقدار فقط fallback هست، اگر در SiteSetting چیزی ست نشده باشه
+# ایمیل
+EMAIL_BACKEND = "core.email_backend.DynamicEmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@example.com"
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True
